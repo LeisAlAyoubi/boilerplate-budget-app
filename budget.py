@@ -1,11 +1,9 @@
 class Category:
-  category_name = ""
-  ledger = list()
-  balance = 0
 
   #Constructor
   def __init__(self,name):
     self.category_name = name
+    self.ledger = list()
    
   #method for print(Object)
   def __repr__(self):
@@ -21,7 +19,6 @@ class Category:
     deposit_dict["amount" ] = amount
     deposit_dict["description" ] = description
     self.ledger.append(deposit_dict)
-    self.balance += amount
 
   #Withdraw method adds amount as negative number. If there are not enough funds, nothing should be added to the ledger.
   def withdraw(self, amount, description=""):
@@ -30,33 +27,31 @@ class Category:
       withdrawal_dict["amount" ] = -amount
       withdrawal_dict["description" ] = description
       self.ledger.append(withdrawal_dict)
-      self.balance -= amount
       return True
     else:
       return False
     
   #returns the net balance
   def get_balance(self):
-    return self.balance
+    balance = 0
+    for item in self.ledger:
+      balance += item["amount"]
+    return balance
 
   #transfer amount from one category to another category
   def transfer(self, amount, Category):
     if(self.check_funds(amount)):
-      transfer_from = "Transfer to " + Category.category_name
-      self.withdraw(amount, transfer_from)
-      transfer_to = "Transfer from " + self.category_name
-      Category.deposit(amount, transfer_to)
+      self.withdraw(amount, "Transfer to " + Category.category_name)
+      Category.deposit(amount, "Transfer from " + self.category_name)
       return True
-    else:
-      return False
+    return False
 
 
-  #checks if a given amount is greater than net balance
-  def check_funds(self,amount):
-      if(amount > self.balance):
-        return False
-      else: 
+  #checks if we have enough money to spend
+  def check_funds(self, amount):
+      if(self.get_balance() >= amount):
         return True
+      return False
     
 
 def create_spend_chart(categories):
